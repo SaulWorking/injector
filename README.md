@@ -1,0 +1,2 @@
+# checkMem
+mem check
