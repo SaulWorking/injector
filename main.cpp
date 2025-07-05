@@ -1,6 +1,4 @@
-#include <Windows.h>
 #include <iostream>
-
 #include "PClass.h"
 using namespace std;
 
@@ -32,21 +30,8 @@ linus process injection if you wajnt
 
 int main(void){
 
-
-    
-    Process openProcess(L"RobloxPlayerBeta.exe");
-
-
-
-cout << "hello world" << endl;
-
-//get handle window not available yet lol
-cout << "hWND of Roblox: " << openProcess.getWindowHandle() << endl;
-cout << "PID of Roblox: " << openProcess.getProcessID() << endl;
-cout << "hPROCESS of Roblox: " << openProcess.getProcessHandle() << endl;
+Process openProcess("RobloxPlayerBeta.exe");
 
 openProcess.~Process();
-
-
     return 0;
 }
