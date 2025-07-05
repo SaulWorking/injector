@@ -34,7 +34,7 @@ int main(void){
 
 
     
-    Process openProcess("RobloxPlayerBeta.exe");
+    Process openProcess(L"RobloxPlayerBeta.exe");
 
 
 
