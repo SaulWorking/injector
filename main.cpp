@@ -1,5 +1,6 @@
 #include <iostream>
-#include "PClass.h"
+#include "Process.h"
+#include "FileSys.h"
 using namespace std;
 
 
@@ -28,9 +29,19 @@ linus process injection if you wajnt
 //https://stackoverflow.com/questions/31072800/openprocess-vs-createprocess
 */
 
+/*
+
+https://sensepost.com/blog/2019/hacking-doom-for-fun-health-and-ammo/
+
+
+*/
+
+
 int main(void){
 
 Process openProcess("RobloxPlayerBeta.exe");
+
+File fileSystem;
 
 openProcess.~Process();
     return 0;
