@@ -1,3 +1,4 @@
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include "FileSys.h"
 #include <tlhelp32.h>
@@ -79,7 +80,7 @@ Process(const char * processName){
     HANDLE getProcessHandle(){return hProcess;}
 
 
-        DWORD findProcessID(const char* fileName){
+        DWORD findProcessID(const char * fileName){
         PROCESSENTRY32 pe32;
         const int tempPID = {0};
         pe32.dwSize = sizeof(PROCESSENTRY32);
@@ -120,7 +121,7 @@ Process(const char * processName){
     bool writeProcessMemory(HANDLE process, LPCVOID buffer, SIZE_T bufferSize ){return WriteProcessMemory(process, NULL, buffer, bufferSize, NULL);}
     
 
-wwwww
+
 };
 
 

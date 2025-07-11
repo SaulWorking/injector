@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Process.h"
-#include "FileSys.h"
+#include "../header/FileSys.h"
+#include "../header/Process.h"
 using namespace std;
 
 
