@@ -4,6 +4,10 @@
 using namespace std;
 
 
+//https://oreans.com/help/tm/hm_i-add-different-vms-in-virtual.htm
+//^^ what are the purpose of VM functions? I dont know... yet
+//^^^ to protect against reverse engineering against malicious and nonmalicious actors
+
 //requirement -> inject into a roblox game
 /*first, find how to inject into a roblox game.
     then, we go through the process.
@@ -40,8 +44,6 @@ https://sensepost.com/blog/2019/hacking-doom-for-fun-health-and-ammo/
 int main(void){
 
 Process openProcess("RobloxPlayerBeta.exe");
-
-File fileSystem;
 
 openProcess.~Process();
     return 0;
