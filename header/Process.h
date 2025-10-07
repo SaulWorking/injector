@@ -7,80 +7,73 @@ const char * GOOD = "[+]";
 const char * BAD = "[-]";
 const char * WAIT = "[*]";
 
-const bool hasHNDInheritance = false;
-const unsigned int emptyValue = NULL;
+const bool HNDInheritable = false;
+const unsigned int fail = -1;
 
 using namespace std;
 
 #ifndef PCLASS_H
 #define PCLASS_H
 
-
 class Buffer{
       private:
-    SIZE_T memoryWriteSize; //memory size
-    LPCVOID memBuffer;      //type of memory // pointer to typedef(any memory type [down]))
+	      SIZE_T memSize; //memory size
+	      LPVOID memBuff;     //type of memory // pointer to typedef(any memory type [down]))
       public:
 
       Buffer(){
-      memoryWriteSize = 0;
-      memBuffer = 0;
+	      memSize = 0;
+	      memBuff = 0;
       }
 
-
-    void setMemoryWriteSize(SIZE_T memSpecy){memoryWriteSize = memSpecy;}
-    void setBuffer(LPCVOID buffer){memBuffer = buffer;}
-    SIZE_T getMemoryWriteSize(){return memoryWriteSize;}
-    LPCVOID getBuffer(){return memBuffer;}
-
+    void setMemSize(SIZE_T memSize){this->memSize = memSize;}
+    void setMemBuff(LPVOID membuff){this->memBuff = memBuff;}
+    SIZE_T getMemSize(){return memSize;}
+    LPVOID getMemBuff(){return memBuff;}
 };
 
 
 
-class Process: public Buffer{
+class Process: public Buffer : public FileSys{
     private:
 //process & memorywrite information
     DWORD PID;              //process id
     HANDLE hProcess;        //process handle
 
     public:                                                     
-Process(): Buffer() {    
-    PID = 0;
-    hProcess = NULL;
-	}
+    Process(): Buffer() 
+    {    
+        PID = 0;
+	hProcess = NULL;
+    }
 
 Process(const char * processName){
     PID = findProcessID(processName);
 
-    if(PID == emptyValue){
+    if(PID == fail){
         cout << '\n' << BAD << "Cannot find Process ID: " << GetLastError();
     }
 
     WaitForSingleObject(hProcess, 500);
-    hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE, hasHNDInheritance, PID);
+
+    hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE, HNDInheritable, PID);
 
     if(hProcess == INVALID_HANDLE_VALUE){
         cout << '\n' << BAD << " Handle error: " << GetLastError();
     }else{
         cout << '\n' << GOOD << " Handle: " << hProcess << endl;
     }
-
 }
+
 
     ~Process(){
         cout << '\n' << WAIT << " closing handle... ";
         CloseHandle(hProcess);
     }
 
-    //y-suffix to denote base variable operation
 
-    void setProcessID(DWORD Piddy){PID = Piddy;}
-    void setProcessHandle(HANDLE PHandy){hProcess = PHandy;}
-    DWORD getProcessID(){return PID;}
-    HANDLE getProcessHandle(){return hProcess;}
-
-
-        DWORD findProcessID(const char * fileName){
+    DWORD findProcessID(const char * fileName)
+    {
         PROCESSENTRY32 pe32;
         const int tempPID = {0};
         pe32.dwSize = sizeof(PROCESSENTRY32);
@@ -90,35 +83,51 @@ Process(const char * processName){
         HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, tempPID);
         
 
-        if(hSnapshot == INVALID_HANDLE_VALUE){
-            cout<< '\n' <<   BAD << " Crazy: " << GetLastError();
+        if(hSnapshot == INVALID_HANDLE_VALUE)
+	{
+
+            cout<< '\n' <<  BAD << " cannot find handle: " << GetLastError();
             exit(EXIT_FAILURE);
         }
 
         cout << '\n' << WAIT << " Finding Process ID...";
                                                             
-        if(Process32First(hSnapshot, &pe32)){
-            do{
-                if(strcmp(pe32.szExeFile, fileName) == 0){
+        if(Process32First(hSnapshot, &pe32))
+	{
+
+            do
+	    {
+                if(strcmp(pe32.szExeFile, fileName) == 0)
+		{
                     CloseHandle(hSnapshot);
 
                     cout  << '\n' << GOOD << " Found PID: " << pe32.th32ProcessID;
-
-                    //remove later lol
-
                     return pe32.th32ProcessID;
                 }
             }while(Process32Next(hSnapshot, &pe32));
         }                                       
         //returning empty PID
-        return emptyValue;
+        return fail;
     }
 
+
+
+
+    void setPID(DWORD PID){this->PID = PID;}
+    void setHProcess(HANDLE hProcess){this->hProcess = hProcess;}
+    DWORD getPID(){return PID;}
+    HANDLE getHProcess(){return hProcess;}
         
 
 
-    bool readProcessMemory(HANDLE process, LPVOID buffer, SIZE_T bufferSize){return ReadProcessMemory(process, NULL, buffer, bufferSize, NULL);}
-    bool writeProcessMemory(HANDLE process, LPCVOID buffer, SIZE_T bufferSize ){return WriteProcessMemory(process, NULL, buffer, bufferSize, NULL);}
+    bool readMem(HANDLE hProcess, Buffer payload)
+	{
+		return ReadProcessMemory(hProcess, NULL, payload.getMemBuff(), payload.getMemSize(), NULL);
+	}
+    bool writeMem(HANDLE hProcess, Buffer payload)
+	{
+		return WriteProcessMemory(hProcess, NULL, payload.getMemBuff(), payload.getMemSize(), NULL);
+	}
     
 
 

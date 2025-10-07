@@ -4,7 +4,7 @@ CXXFLAGS := -W
 
 # Folders
 SRC_DIR := src
-BIN_DIR := output/bin
+BIN_DIR := output
 
 # Target executable
 TARGET := $(BIN_DIR)/main

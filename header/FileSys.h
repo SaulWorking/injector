@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <iostream>
+#include <string>
 #include <fstream>
 
 using namespace std;
@@ -10,19 +11,23 @@ using namespace std;
 class File {
     private:
     
-    char * fileName;
+    string fileName;
     filesystem::path filePath;
-    filesystem::path userPath;
+    filesystem::path curDir;
 
     public:
+	
+    File()
+    {
+	fileName = "
+    }
 
-filesystem::path findFile(const char * fileName){
-    
-    userPath = filesystem::current_path();
-    filePath = userPath / fileName;
-
-    return filePath;
-}
+	filesystem::path findFile(string fileName)
+	{
+	    curDir = filesystem::current_path();
+	    filePath = curDir / fileName;
+	    return filePath;
+	}
 
 
 

@@ -39,12 +39,12 @@ https://sensepost.com/blog/2019/hacking-doom-for-fun-health-and-ammo/
 
 
 */
+int main(int args, char* argv[]){	
+	Process openProcess("RobloxPlayerBeta.exe");
 
+	cout << "\nprogram end" << endl;
 
-int main(void){
+	openProcess.~Process();
 
-Process openProcess("RobloxPlayerBeta.exe");
-
-openProcess.~Process();
     return 0;
 }
