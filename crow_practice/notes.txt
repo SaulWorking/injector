@@ -1,0 +1,63 @@
+Windows:
+
+WIN_32 API is well documented
+NT API is not well documented
+
+============================================
+A process is an instance of an executable(.exe)
+	(i.e google with multiple tabs [child processes])
+Processes dont know about each other.
+
+Processes are divided into 3 groups:
+	Apps
+		-if the process has a visible window
+	Windows Processes
+		- if the process is marked as critical
+	Background Processes
+		- if not critical or with a window
+Processes have priority
+	- on CPU time
+Realtime, Normal, and Low (3/6)
+- like PriorityQueue()
+
+The scheduling system determines execution of process and threads on the CPU 
+
+Processes have a PID (Process ID)
+
+Process operations can be found on the MSDN.
+
+Processes start with ONE thread. (The primary thread) and can create
+additional threads.
+Processes have handles
+
+Processes are resource  heavy.
+============================================
+A thread  is in a process that can be scheduled for execution.
+All threads of a process share the thread's virtual address space and system resources
+Threads have their own security context, which can be used to impersonate
+clients.
+Thread contexts have their set of machine registers, the kernel stack, a
+thread environment block, and a user stack in the address space of the
+thread's process
+Multi-threading is used in modern applications because of efficiency (in
+parallel)
+
+Threads have Thread IDS 
+Threads have handles
+threads are resource light.
+threads work together. (interdependent)
+
+============================================
+A handle is a generic unit of identification
+A handle is a pointer to an object
+A handle allows our code to interact with it 
+	- without directly accessing its memory location
+Handles will be processed through MSDN functions like OpenProcess();
+	HANDLE (handles to processes)
+	HWND	(handles to window)
+	HMODULE	(handles to module)
+(example in <winnt.h>)
+
+Handles are systemwide
+
+Processes can send handles to each other.
