@@ -1,17 +1,41 @@
 #include <windows.h>
 #include <stdio.h>
 
+#define DECOR() printf("==================================================================\n")
+#define INFO(MSG, ...) printf("[HI] "  MSG  "\n", ##__VA_ARGS__)
+#define GOOD(MSG, ...) printf("[W]"  MSG  "\n", ##__VA_ARGS__)
+#define BAD(MSG, ...) printf("[L]"  MSG  "\n", ##__VA_ARGS__)
+
+const wchar_t* app_path = L"C:\\Windows\\System32\\notepad.exe";	//application path
+
+VOID DisplayProcessInfo(
+		_In_ DWORD dwThreadId,
+		_In_ DWORD dwProcessId,
+		_In_ HANDLE hThread,
+		_In_ HANDLE hProcess
+){
+	DECOR();
+	INFO("PID: %ld\n",dwProcessId);
+	INFO("TID: %ld\n",dwThreadId);
+	INFO("Process Handle: %p\n",hProcess);
+	INFO("Thread Handle: %p\n",hThread);
+	DECOR();
+}
+
+VOID finishHandle(
+		_In_	HANDLE hThread,
+		_In_	HANDLE hProcess
+){
+	if(hThread != NULL){CloseHandle(hThread);}
+	if(hProcess != NULL){CloseHandle(hProcess);}
+}	
 
 int main(void){
 
 struct _STARTUPINFOW si = { 0 };
 struct _PROCESS_INFORMATION pi = { 0 };
 
-const wchar_t* app_path = L"C:\\Windows\\System32\\notepad.exe";	//application path
-
-
-printf("(<_<) Trying to start process: %ld\n",app_path);
-
+INFO("Trying to start process: %S",app_path);
 	if(!CreateProcessW(
 		app_path,
 		NULL,	//command line commands
@@ -21,43 +45,37 @@ printf("(<_<) Trying to start process: %ld\n",app_path);
 		BELOW_NORMAL_PRIORITY_CLASS, // priority class
 		NULL, //pointer to environment
 		NULL, //current directory Path
-		&si,	//START UP INFO POINTER
+			&si,	//START UP INFO POINTER
 		&pi	//PROCESS INFO POINTER
 	)){
-	
-		printf("(<_<) process couldn't be created, %ld\n", GetLastError());	
+BAD("PROCESS COULDN'T BE CREATED %ld",GetLastError());
 	}	
 
-printf("(^_^) process has been created successfully)\n");
-printf("==================================================================\n");
-printf("(tung) PID: %ld\n",pi.dwProcessId);
-printf("(tung) TID: %ld\n",pi.dwThreadId);
-printf("(tung) Process Handle: %p\n",pi.hProcess);
-printf("(tung) Thread Handle: %p\n",pi.hThread);
-printf("==================================================================\n");
+GOOD("PROCESS HAS BEEN CREATED");
+	DisplayProcessInfo(
+		pi.dwProcessId,
+		pi.dwThreadId,
+		pi.hProcess,
+		pi.hThread
+	);
 
-
-switch(WaitForSingleObject(pi.hProcess,1000)){
-
-	case WAIT_ABANDONED:
-	break;
-
+switch(WaitForSingleObject(pi.hProcess,INFINITE)){
 	case WAIT_OBJECT_0:
+	INFO("Process is closing...");
+	finishHandle(pi.hProcess,pi.hThread);
+	GOOD("HANDLES CLOSED");
 	break;
 
 	case WAIT_TIMEOUT:
-	printf("(bye) The process is closing..");
-	if(CloseHandle(pi.hProcess) || CloseHandle(pi.hThread))
-		printf("(^_^) atleast one handle closed successfully");
-	TerminateProcess(pi.hProcess,0);
 	break;
 
 	case WAIT_FAILED:
+	finishHandle(pi.hProcess,pi.hThread);
+	BAD("PROCESS WAIT FAILED");
 	break;
+
 	default:
 	printf("(bye) idk nothing happened");
 }
-
-
 	return EXIT_SUCCESS;
 }
