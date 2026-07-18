@@ -28,7 +28,7 @@ DWORD getPID(_In_ const char* processName)
 	PROCESSENTRY32  pe32; 	//info of process
 	
 	hProcessSnap = CreateToolhelp32Snapshot(
-			TH32CS_SNAPPROCESS, //TOOL FLAG
+			TH32CS_SNAPPROCESS, //snapshot Process flag
 			0		    //Process ID
 			);
 	if(hProcessSnap == INVALID_HANDLE_VALUE)
@@ -43,7 +43,7 @@ DWORD getPID(_In_ const char* processName)
 
 	if(Process32First(
 		hProcessSnap, //list of processes
-		&pe32	//change pe32 value
+		&pe32	      //change pe32 value
 		))
 	{
 
@@ -63,21 +63,59 @@ DWORD getPID(_In_ const char* processName)
 
 HANDLE work(_In_ DWORD PID)
 {
+	SIZE_T MEEEE_SIZE = sizeof(PROCESSENTRY32);
+
 	HANDLE hProcess = OpenProcess(
-						PROCESS_VM_READ | PROCESS_VM_WRITE,
-						FALSE, 
-						PID
+		PROCESS_VM_READ | PROCESS_VM_WRITE,	//access flags
+		FALSE, //inheritance
+		PID	
 	);
-	LPVOID lpAddress = VirtualAllocEx(
-		hProcess,
-		NULL,
-		100,
-		NULL,
-		NULL
+	
+	if(hProcess == INVALID_HANDLE_VALUE)
+	{
+		BAD("COULD NOT OPEN PROCESS");
+		return NULL;
+	}
+
+	LPVOID lpBaseAddress = VirtualAllocEx(
+		hProcess,			//process to allocate to
+		NULL,				//starting address
+		MEEEE_SIZE,			//size of memory region
+		MEM_COMMIT | MEM_RESERVE,	//allocation type flags
+		PAGE_EXECUTE_READWRITE		//memory protection flags
 	);
 
+	if(lpBaseAddress == NULL)
+	{
+		BAD("COULD NOT ALLOCATE MEMORY");
+		return NULL;
+	}
 
+	BOOL isWritten = WriteProcessMemory(
+		hProcess,	//process to allocate to
+		lpBaseAddress,	//starting address
+		L"6767676767",	//LPCVOID buffer
+		MEEEE_SIZE	//# of bytes to be written (in)
+		NULL	//# of bytes written	(out)
+	);
+	
+	if(!isWritten)
+	{
+		BAD("COULD NOT WRITE TO PROCESS MEMORY");
+		return NULL;
+	}
 
+		
+	HANDLE	hThread = CreateRemoteThreadEx(
+		hProcess, //process to create thread
+		NULL,     //security attributes
+		MEEEE_SIZE, //dwStackSize (See Thread Stack Size on the MSDN for more information.)
+		lpBaseAddress,	//starting address from memory allocated
+		NULL, //pointer to be passed through to the thread function (no need?)
+		0,     //creation behavior flag
+		NULL,	//lpAttributeList (in)
+		NULL	//lpThreadId (out)
+	);
 }
 
 /**
