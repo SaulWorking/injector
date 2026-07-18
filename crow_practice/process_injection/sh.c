@@ -8,15 +8,36 @@
 #define INFO(MSG, ...) printf("[HI] "  MSG  "\n", ##__VA_ARGS__)
 #define GOOD(MSG, ...) printf("[W]"  MSG  "\n", ##__VA_ARGS__)
 #define BAD(MSG, ...) printf("[L]"  MSG  "\n", ##__VA_ARGS__)
+#define ERR(MSG, ...) {	DECOR();				  \
+			fprintf(stderr,				  \
+				"ERROR CODE: " "0x%ld " MSG "\n"  \
+				"FUNCTION: %s()\n" 	    	  \
+				"LINE: %ld\n",                    \
+				GetLastError(),__func__,__LINE__);\
+			DECOR();				  \
+		       }
 
 DWORD getPID(_In_ const char* processName);
+HANDLE work(_In_ DWORD PID);
+VOID CleanHandleWait(
+		_In_ HANDLE hProcess,
+		_In_ HANDLE hThread
+		
+		);
 
 int main(void)
 {
 
 	DWORD PID = getPID("notepad.exe");
+	if(PID == -1)
+	{
+		return EXIT_FAILURE;
+	}
 
 	INFO("PID: %lu",PID);
+	work(PID);
+	INFO("SOMETHING IS HAPPENING");
+
 	return EXIT_SUCCESS;
 }
 
@@ -33,7 +54,7 @@ DWORD getPID(_In_ const char* processName)
 			);
 	if(hProcessSnap == INVALID_HANDLE_VALUE)
 	{
-		BAD("ERROR");
+		ERR("HANDLE NOT FOUND");
 		return -1;
 	}
 
@@ -56,7 +77,7 @@ DWORD getPID(_In_ const char* processName)
 		}while(Process32Next(hProcessSnap, &pe32));
 	}
 
-	BAD("No PID found...");
+	ERR("No PID found...");
 	CloseHandle(hProcessSnap);
 	return -1;
 }
@@ -66,14 +87,14 @@ HANDLE work(_In_ DWORD PID)
 	SIZE_T MEEEE_SIZE = sizeof(PROCESSENTRY32);
 
 	HANDLE hProcess = OpenProcess(
-		PROCESS_VM_READ | PROCESS_VM_WRITE,	//access flags
-		FALSE, //inheritance
-		PID	
+		PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION,	//access flags
+		FALSE, 					//inheritance
+		PID					//DWORD Process ID
 	);
 	
 	if(hProcess == INVALID_HANDLE_VALUE)
 	{
-		BAD("COULD NOT OPEN PROCESS");
+		ERR("COULD NOT OPEN PROCESS");
 		return NULL;
 	}
 
@@ -87,16 +108,16 @@ HANDLE work(_In_ DWORD PID)
 
 	if(lpBaseAddress == NULL)
 	{
-		BAD("COULD NOT ALLOCATE MEMORY");
+		ERR("COULD NOT ALLOCATE MEMORY");
 		return NULL;
 	}
 
 	BOOL isWritten = WriteProcessMemory(
 		hProcess,	//process to allocate to
 		lpBaseAddress,	//starting address
-		L"6767676767",	//LPCVOID buffer
-		MEEEE_SIZE	//# of bytes to be written (in)
-		NULL	//# of bytes written	(out)
+		L"6767676767",	//LPCVOID buffer 	   (pointer  to a constant of any type)
+		MEEEE_SIZE,	//# of bytes to be written (in)
+		NULL		//# of bytes written	   (out)
 	);
 	
 	if(!isWritten)
@@ -107,15 +128,45 @@ HANDLE work(_In_ DWORD PID)
 
 		
 	HANDLE	hThread = CreateRemoteThreadEx(
-		hProcess, //process to create thread
-		NULL,     //security attributes
-		MEEEE_SIZE, //dwStackSize (See Thread Stack Size on the MSDN for more information.)
-		lpBaseAddress,	//starting address from memory allocated
-		NULL, //pointer to be passed through to the thread function (no need?)
-		0,     //creation behavior flag
-		NULL,	//lpAttributeList (in)
-		NULL	//lpThreadId (out)
+		hProcess,			 //process to create thread
+		NULL,    			 //security attributes
+		MEEEE_SIZE, 		       	 //dwStackSize (See Thread Stack Size on the MSDN for more information.)
+		lpBaseAddress,			 //starting address from memory allocated
+		NULL,				 //pointer to be passed through to the thread function (no need?)
+		0,    				 //creation behavior flag
+		NULL,				 //lpAttributeList (in)
+		NULL				 //lpThreadId (out)
 	);
+
+	CleanHandleWait(hProcess,hThread);
+}
+
+
+
+
+
+VOID CleanHandleWait(HANDLE hProcess, HANDLE hThread){
+	switch(WaitForSingleObject(hProcess,INFINITE)){
+		case WAIT_OBJECT_0:
+		INFO("Process is closing...");
+			if(hProcess != NULL){CloseHandle(hProcess);}
+			if(hThread != NULL){CloseHandle(hThread);}
+		GOOD("HANDLES CLOSED");
+		break;
+
+		case WAIT_TIMEOUT:
+		break;
+
+		case WAIT_FAILED:
+			if(hProcess != NULL){CloseHandle(hProcess);}
+			if(hThread != NULL){CloseHandle(hThread);}
+		ERR("PROCESS WAIT FAILED");
+		break;
+
+		default:
+		ERR("UNKNOWN SIGNAL");
+	}
+
 }
 
 /**
