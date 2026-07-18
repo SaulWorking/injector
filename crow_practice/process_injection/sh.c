@@ -8,13 +8,14 @@
 #define INFO(MSG, ...) printf("[HI] "  MSG  "\n", ##__VA_ARGS__)
 #define GOOD(MSG, ...) printf("[W]"  MSG  "\n", ##__VA_ARGS__)
 #define BAD(MSG, ...) printf("[L]"  MSG  "\n", ##__VA_ARGS__)
-#define ERR(MSG, ...) {	DECOR();				  \
-			fprintf(stderr,				  \
-				"ERROR CODE: " "0x%ld " MSG "\n"  \
-				"FUNCTION: %s()\n" 	    	  \
-				"LINE: %ld\n",                    \
-				GetLastError(),__func__,__LINE__);\
-			DECOR();				  \
+#define ERR(MSG, ...) {	DECOR();				          \
+			fprintf(stderr,				          \
+	      	      		"[EEK] "  MSG "\n"		       	  \
+				"[EEK] ERROR CODE:      0x%ld\n"          \
+				"[EEK] FUNCTION:        %s()\n" 	  \
+				"[EEK] LINE: 	       %ld\n",            \
+				GetLastError(),__func__,__LINE__);     	  \
+			DECOR();					  \
 		       }
 
 DWORD getPID(_In_ const char* processName);
@@ -140,8 +141,6 @@ HANDLE work(_In_ DWORD PID)
 
 	CleanHandleWait(hProcess,hThread);
 }
-
-
 
 
 
