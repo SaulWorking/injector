@@ -2,6 +2,7 @@ Windows:
 
 WIN_32 API is well documented
 NT API is not well documented
+Well hidden injections are  made using a variety of techniques
 
 ============================================
 A process is an instance of an executable(.exe)
@@ -61,3 +62,6 @@ Handles will be processed through MSDN functions like OpenProcess();
 Handles are systemwide
 
 Processes can send handles to each other.
+============================================
+A page in a process is a block of contiguous memory
+
