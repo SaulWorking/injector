@@ -84,10 +84,10 @@ DWORD getPID(_In_ const char* processName)
 
 HANDLE work(_In_ DWORD PID)
 {
-	SIZE_T MEEEE_SIZE = sizeof(PROCESSENTRY32);
+	SIZE_T MEEEE_SIZE = sizeof(L"6767676767");
 
 	HANDLE hProcess = OpenProcess(
-		PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION,	//access flags
+		PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION | PROCESS_CREATE_THREAD,	//access flags
 		FALSE, 					//inheritance
 		PID					//DWORD Process ID
 	);
