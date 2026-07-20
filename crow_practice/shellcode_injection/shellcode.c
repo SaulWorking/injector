@@ -1,5 +1,5 @@
 //compile using 
-// "clang++ -m64 -o shellcode.exe shellcode.c"
+// "clang -m64 -o shellcode.exe shellcode.c"
 
 #include <windows.h>
 #include <tlhelp32.h>
